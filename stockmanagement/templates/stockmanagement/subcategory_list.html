@@ -1,0 +1,8 @@
+{% extends 'layout.html' %}
+{% block title %} Subcategories {% endblock %}
+{% block content %}
+    <h1>{{ category.name }}Types</h1>
+    {% for subcategory in category.subcategory_set.all %}
+        <h3><a href="{% url 'stockmanagement:product_profiles' category_pk=category.pk subcategory_pk=subcategory.pk%}">{{ subcategory.name }}</a></h3>
+    {% endfor %}
+{% endblock %}

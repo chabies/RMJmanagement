@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% load static from staticfiles %}
+{% load leaflet_tags %}
+{% block head %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+        <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <script type="text/javascript" src="{% static 'jquery-3.2.1/jquery-3.2.1.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <h3>{{ subcategory.name }}</h3>
+
+    <div id="LeftPanel" style="width: 30%; height: 100%; padding:0px; margin:0px; float: left;">
+        <form method="POST" action="">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" class="button" value="Save">
+        </form>
+    </div>
+
+    <div id="map" style="width: 70%; height: 100%; padding:0px; margin:0px; float: right;">
+        {% leaflet_map "map" callback="window.drawLayers" %}
+    </div>
+
+    <script type="text/javascript">
+
+        function drawLayers(map) {
+            var $lat = $("input[name=latitude]")
+            var $lng = $("input[name=longitude]")
+            //When clicked,
+            var marker;
+            map.on('click', function(e){
+                //latlng gets extracted
+                var latlng = e.latlng;
+                var lat = latlng.lat
+                var lng = latlng.lng
+                //it is passed to the location input value
+                $lat.val(lat)
+                $lng.val(lng)
+                //Update marker position everytime clicked
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                marker = L.marker([lat,lng]).addTo(map);
+
+
+
+            });
+
+
+        }
+
+
+    </script>
+{% endblock %}
+

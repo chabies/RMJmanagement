@@ -1,0 +1,25 @@
+{% load static from staticfiles %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+
+        {% block head %}{% endblock %}
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    </head>
+    <body>
+        <div class="nav" style="height:10%;">
+            <nav class="navbar">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'stockmanagement:category_list' %}">Management</a>
+            </nav>
+        </div>
+        <div class="content" style="height:90%;">
+            {% block content %}{% endblock %}
+        </div>
+
+
+    </body>
+
+</html>

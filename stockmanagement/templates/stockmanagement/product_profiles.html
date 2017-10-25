@@ -1,0 +1,102 @@
+{% extends 'layout.html' %}
+{% load static from staticfiles %}
+{% load leaflet_tags %}
+{% block head %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+        <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'routing/leaflet-routing-machine.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/easy-button.css' %}">
+
+    <script type="text/javascript" src="{% static 'jquery-3.2.1/jquery-3.2.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'routing/leaflet-routing-machine.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'js/easy-button.js' %}" ></script>
+{% endblock %}
+
+{% block title %} Subcategories {% endblock %}
+
+{% block content %}
+    <div id="LeftPanel" style="width: 30%; height: 100%; padding:0px; margin:0px; float: left;">
+        <div id="LeftPanel-top" style="width:100%; height:25%; padding:0px; margin:0px; float: left;">
+            <h1><a href="{% url 'stockmanagement:subcategory_list' pk=subcategory.category.pk %}">{{ subcategory.name }}</a></h1>
+            <h5><a href="{% url 'stockmanagement:add_product' category_pk=subcategory.category.pk subcategory_pk=subcategory.pk %}" class="button">Add product</a></h5>
+        </div>
+
+        <div id="LeftPanel-bottom" style="width:100%; height:75%; padding:0px; margin:0px; float: left; overflow-y: auto;">
+            {% for product in subcategory.product_set.all %}
+            <ul>
+                    <li class="name">{{ product.name }}</li>
+                    <li class="weight">Weight: {{ product.weight }} kg</li>
+                    <li class="stock">Stock: {{ product.stock }} e.a.</li>
+                    <button class="location" data-lng= "{{ product.location.x }}" data-lat="{{ product.location.y }}">Location</button>
+            </ul>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="map" style="width: 70%; height: 100%; padding:0px; margin:0px; float: right;">
+        {% leaflet_map "map" callback="window.drawLayers" %}
+    </div>
+
+    <script type="text/javascript">
+        function drawLayers(map) {
+            var $location = $(".location")
+            //Make markers for all the products
+                //get the coords for each product
+           $(".name").each(function(){
+                var lat = $(this).siblings(".location").data("lat");
+                var lng = $(this).siblings(".location").data("lng");
+                var name = $(this).text();
+                var weight = $(this).siblings(".weight").text();
+                var stock = $(this).siblings(".stock").text();
+                //Make a marker
+                var marker = L.marker([lat,lng]).addTo(map).bindPopup(name+'<br>'+weight+'<br>'+stock);
+
+            });
+
+            //When Location is clicked
+            $location.click(function () {
+            //Pan to zoom the location
+                //Get the coords
+                var lng = $(this).data("lng");
+                var lat = $(this).data("lat");
+                var latlng = [lat, lng]
+                //Pop up the name of the product information
+                var name = $(this).siblings(".name").text();
+                var weight = $(this).siblings(".weight").text();
+                var stock = $(this).siblings(".stock").text();
+                var popup = L.popup().setLatLng(latlng).setContent
+                (name+'<br>'+weight+'<br>'+stock)
+                    .openOn(map);
+                //Pan to zoom the coords
+                map.setZoom(8).panTo(latlng)
+
+            });
+
+            //Click a marker and show the popup
+
+            //Routing function
+
+
+
+
+        };
+
+
+
+
+
+
+    </script>
+
+
+{% endblock %}
